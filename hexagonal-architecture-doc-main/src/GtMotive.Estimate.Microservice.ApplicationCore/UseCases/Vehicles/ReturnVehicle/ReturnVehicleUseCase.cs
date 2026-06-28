@@ -10,17 +10,14 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.Retur
     public class ReturnVehicleUseCase : IReturnVehicleUseCase
     {
         private readonly IVehicleRepository vehicleRepository;
-        private readonly IOutputPortStandard<ReturnVehicleOutput> outputPort;
-        private readonly IOutputPortNotFound notFoundOutputPort;
+        private readonly IReturnVehicleOutputPort outputPort;
 
         public ReturnVehicleUseCase(
             IVehicleRepository vehicleRepository,
-            IOutputPortStandard<ReturnVehicleOutput> outputPort,
-            IOutputPortNotFound notFoundOutputPort)
+            IReturnVehicleOutputPort outputPort)
         {
             this.vehicleRepository = vehicleRepository;
             this.outputPort = outputPort;
-            this.notFoundOutputPort = notFoundOutputPort;
         }
 
         public async Task Execute(ReturnVehicleInput input)
@@ -34,7 +31,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.Retur
 
             if (vehicle is null)
             {
-                this.notFoundOutputPort.NotFoundHandle($"Vehicle '{input.VehicleId}' was not found.");
+                this.outputPort.NotFoundHandle($"Vehicle '{input.VehicleId}' was not found.");
                 return;
             }
 
