@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Infrastructure.Interfaces;
 using GtMotive.Estimate.Microservice.Infrastructure.Logging;
+using GtMotive.Estimate.Microservice.Infrastructure.Persistence;
 using GtMotive.Estimate.Microservice.Infrastructure.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ namespace GtMotive.Estimate.Microservice.Infrastructure
             bool isDevelopment)
         {
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
+            services.AddSingleton<IVehicleRepository, InMemoryVehicleRepository>();
 
             if (!isDevelopment)
             {
