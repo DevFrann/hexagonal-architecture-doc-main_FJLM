@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" />
-    <PackageReference Include="SonarAnalyzer.CSharp" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
   </ItemGroup>
 
 </Project>

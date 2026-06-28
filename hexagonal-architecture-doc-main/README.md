@@ -17,6 +17,29 @@ dotnet run --project src/GtMotive.Estimate.Microservice.Host/GtMotive.Estimate.M
 
 Por defecto el microservicio usa un repositorio en memoria para vehiculos, asi que no necesita base de datos ni Docker para probar el flujo basico.
 
+### Ejecutar con Docker
+
+Construccion manual:
+
+```bash
+docker build -f src/GtMotive.Estimate.Microservice.Host/Dockerfile -t gtmotive-estimate-microservice-host .
+docker run --rm -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development gtmotive-estimate-microservice-host
+```
+
+Con docker compose:
+
+```bash
+docker compose -f src/docker-compose.yml -f src/docker-compose.override.yml up --build
+```
+
+La API quedara disponible en `http://localhost:8080`.
+
+### Visual Studio
+
+- La solucion incluye [docker-compose.dcproj](C:/Users/franj/Downloads/hexagonal-architecture-doc-main_FJLM/hexagonal-architecture-doc-main/src/docker-compose.dcproj) para que Docker aparezca como opcion de inicio en Visual Studio.
+- El proyecto host incluye un perfil `Docker` en [launchSettings.json](C:/Users/franj/Downloads/hexagonal-architecture-doc-main_FJLM/hexagonal-architecture-doc-main/src/GtMotive.Estimate.Microservice.Host/Properties/launchSettings.json).
+- [.dockerignore](C:/Users/franj/Downloads/hexagonal-architecture-doc-main_FJLM/hexagonal-architecture-doc-main/.dockerignore) excluye artefactos locales y de build para no contaminar la imagen.
+
 ### Lanzar tests
 
 Todos los tests:
@@ -85,6 +108,7 @@ curl -X POST http://localhost:5000/api/vehicles/{vehicleId}/return
 - Arquitectura hexagonal: el dominio y los casos de uso no dependen de ASP.NET Core ni de la persistencia concreta.
 - Dominio con reglas de negocio: la entidad `Vehicle` protege invariantes como antiguedad maxima, alquiler y devolucion.
 - Repositorio in-memory: permite ejecutar y probar el microservicio localmente sin dependencias externas.
+- Dockerizacion: usa imagenes oficiales `mcr.microsoft.com/dotnet/sdk:9.0` y `mcr.microsoft.com/dotnet/aspnet:9.0`, con arranque en `Development` para no depender de Key Vault al ejecutar en contenedor.
 - Tests:
   - Unitarios para casos de uso aislados.
   - Funcionales para flujo real con DI y repositorio en memoria.
