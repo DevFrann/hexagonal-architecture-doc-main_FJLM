@@ -1,0 +1,6 @@
+.dotnet/
+.vs/
+.agents/
+*.user
+*.suo
+TestResults/

@@ -10,6 +10,8 @@ namespace GtMotive.Estimate.Microservice.Api.UseCases.Vehicles
 
         public void StandardHandle(ListAvailableVehiclesOutput response)
         {
+            System.ArgumentNullException.ThrowIfNull(response);
+
             this.ActionResult = new OkObjectResult(response.Vehicles);
         }
     }

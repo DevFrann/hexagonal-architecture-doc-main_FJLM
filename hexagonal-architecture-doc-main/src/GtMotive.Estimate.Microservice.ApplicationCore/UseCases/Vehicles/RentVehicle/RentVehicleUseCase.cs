@@ -22,9 +22,10 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.RentV
 
         public async Task Execute(RentVehicleInput input)
         {
+            ArgumentNullException.ThrowIfNull(input);
+
             var cancellationToken = CancellationToken.None;
             var vehicleId = ParseVehicleId(input.VehicleId);
-            var customerId = ParseCustomerId(input.CustomerId);
 
             var vehicle = await this.vehicleRepository
                 .GetByIdAsync(vehicleId, cancellationToken)
@@ -45,7 +46,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.RentV
                 throw new DomainException($"Customer '{input.CustomerId}' already has an active rental.");
             }
 
-            vehicle.Rent(customerId);
+            vehicle.Rent(input.CustomerId);
 
             await this.vehicleRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -64,16 +65,6 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.RentV
             }
 
             return VehicleId.From(parsedVehicleId);
-        }
-
-        private static Guid ParseCustomerId(string customerId)
-        {
-            if (!Guid.TryParse(customerId, out var parsedCustomerId))
-            {
-                throw new DomainException("Customer id is invalid.");
-            }
-
-            return parsedCustomerId;
         }
     }
 }

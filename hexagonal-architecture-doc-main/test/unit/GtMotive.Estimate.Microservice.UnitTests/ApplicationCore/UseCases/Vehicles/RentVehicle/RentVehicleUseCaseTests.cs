@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,12 +23,12 @@ namespace GtMotive.Estimate.Microservice.UnitTests.ApplicationCore.UseCases.Vehi
             var repository = new FakeVehicleRepository([vehicle]);
             var outputPort = new FakeRentVehicleOutputPort();
             var useCase = new RentVehicleUseCase(repository, outputPort);
-            var customerId = Guid.NewGuid().ToString();
+            var customerId = "customer-001";
 
             await useCase.Execute(new RentVehicleInput(vehicle.Id.Value.ToString(), customerId));
 
             vehicle.Status.Should().Be(VehicleStatus.Rented);
-            vehicle.CurrentRentalCustomerId.Should().Be(Guid.Parse(customerId));
+            vehicle.CurrentRentalCustomerId.Should().Be(customerId);
             repository.SaveChangesCalled.Should().BeTrue();
             outputPort.StandardResponse.Should().NotBeNull();
             outputPort.StandardResponse!.VehicleId.Should().Be(vehicle.Id);
@@ -41,7 +42,7 @@ namespace GtMotive.Estimate.Microservice.UnitTests.ApplicationCore.UseCases.Vehi
         public async Task Execute_ShouldThrowDomainException_WhenCustomerAlreadyHasAnActiveRental()
         {
             var vehicle = CreateVehicle();
-            var customerId = Guid.NewGuid().ToString();
+            var customerId = "customer-002";
             var repository = new FakeVehicleRepository([vehicle])
             {
                 HasActiveRentalByCustomerResult = true,
@@ -66,7 +67,7 @@ namespace GtMotive.Estimate.Microservice.UnitTests.ApplicationCore.UseCases.Vehi
             var outputPort = new FakeRentVehicleOutputPort();
             var useCase = new RentVehicleUseCase(repository, outputPort);
             var vehicleId = Guid.NewGuid().ToString();
-            var customerId = Guid.NewGuid().ToString();
+            var customerId = "customer-003";
 
             await useCase.Execute(new RentVehicleInput(vehicleId, customerId));
 
@@ -123,12 +124,12 @@ namespace GtMotive.Estimate.Microservice.UnitTests.ApplicationCore.UseCases.Vehi
 
             public Task<Vehicle?> GetByIdAsync(VehicleId id, CancellationToken cancellationToken)
             {
-                return Task.FromResult(this.vehicles.FirstOrDefault(vehicle => vehicle.Id == id));
+                return Task.FromResult(this.vehicles.Find(vehicle => vehicle.Id == id));
             }
 
             public Task<Vehicle?> GetByLicensePlateAsync(LicensePlate licensePlate, CancellationToken cancellationToken)
             {
-                return Task.FromResult(this.vehicles.FirstOrDefault(vehicle => vehicle.LicensePlate == licensePlate));
+                return Task.FromResult(this.vehicles.Find(vehicle => vehicle.LicensePlate == licensePlate));
             }
 
             public Task<IReadOnlyCollection<Vehicle>> GetAvailableAsync(CancellationToken cancellationToken)

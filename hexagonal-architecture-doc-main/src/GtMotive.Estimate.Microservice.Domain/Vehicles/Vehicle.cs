@@ -1,11 +1,23 @@
+#nullable enable
 using System;
 
 namespace GtMotive.Estimate.Microservice.Domain.Vehicles
 {
+    /// <summary>
+    /// Vehicle aggregate root.
+    /// </summary>
     public class Vehicle
     {
         private const int MaximumVehicleAgeInYears = 5;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vehicle"/> class.
+        /// </summary>
+        /// <param name="id">Vehicle identifier.</param>
+        /// <param name="licensePlate">Vehicle license plate.</param>
+        /// <param name="brand">Vehicle brand.</param>
+        /// <param name="model">Vehicle model.</param>
+        /// <param name="manufactureDate">Vehicle manufacture date.</param>
         public Vehicle(
             VehicleId id,
             LicensePlate licensePlate,
@@ -39,23 +51,48 @@ namespace GtMotive.Estimate.Microservice.Domain.Vehicles
             this.CurrentRentalCustomerId = null;
         }
 
+        /// <summary>
+        /// Gets the vehicle identifier.
+        /// </summary>
         public VehicleId Id { get; }
 
+        /// <summary>
+        /// Gets the vehicle license plate.
+        /// </summary>
         public LicensePlate LicensePlate { get; }
 
+        /// <summary>
+        /// Gets the vehicle brand.
+        /// </summary>
         public string Brand { get; }
 
+        /// <summary>
+        /// Gets the vehicle model.
+        /// </summary>
         public string Model { get; }
 
+        /// <summary>
+        /// Gets the manufacture date.
+        /// </summary>
         public DateOnly ManufactureDate { get; }
 
+        /// <summary>
+        /// Gets the current vehicle status.
+        /// </summary>
         public VehicleStatus Status { get; private set; }
 
-        public Guid? CurrentRentalCustomerId { get; private set; }
+        /// <summary>
+        /// Gets the current rental customer identifier, when any.
+        /// </summary>
+        public string? CurrentRentalCustomerId { get; private set; }
 
-        public void Rent(Guid customerId)
+        /// <summary>
+        /// Rents the vehicle to a customer.
+        /// </summary>
+        /// <param name="customerId">Customer identifier.</param>
+        public void Rent(string customerId)
         {
-            if (customerId == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(customerId))
             {
                 throw new DomainException("Customer id cannot be empty.");
             }
@@ -66,9 +103,12 @@ namespace GtMotive.Estimate.Microservice.Domain.Vehicles
             }
 
             this.Status = VehicleStatus.Rented;
-            this.CurrentRentalCustomerId = customerId;
+            this.CurrentRentalCustomerId = customerId.Trim();
         }
 
+        /// <summary>
+        /// Returns the vehicle to available status.
+        /// </summary>
         public void Return()
         {
             if (this.Status != VehicleStatus.Rented)

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace GtMotive.Estimate.Microservice.Infrastructure.Persistence
 
             lock (this.syncRoot)
             {
-                return Task.FromResult(this.vehicles.FirstOrDefault(vehicle => vehicle.Id == id));
+                return Task.FromResult(this.vehicles.Find(vehicle => vehicle.Id == id));
             }
         }
 
@@ -41,7 +42,7 @@ namespace GtMotive.Estimate.Microservice.Infrastructure.Persistence
 
             lock (this.syncRoot)
             {
-                return Task.FromResult(this.vehicles.FirstOrDefault(vehicle => vehicle.LicensePlate == licensePlate));
+                return Task.FromResult(this.vehicles.Find(vehicle => vehicle.LicensePlate == licensePlate));
             }
         }
 
@@ -63,16 +64,11 @@ namespace GtMotive.Estimate.Microservice.Infrastructure.Persistence
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!Guid.TryParse(customerId, out var parsedCustomerId))
-            {
-                return Task.FromResult(false);
-            }
-
             lock (this.syncRoot)
             {
-                return Task.FromResult(this.vehicles.Any(vehicle =>
+                return Task.FromResult(this.vehicles.Exists(vehicle =>
                     vehicle.Status == VehicleStatus.Rented &&
-                    vehicle.CurrentRentalCustomerId == parsedCustomerId));
+                    string.Equals(vehicle.CurrentRentalCustomerId, customerId, StringComparison.Ordinal)));
             }
         }
 

@@ -1,3 +1,4 @@
+#nullable enable
 using System.ComponentModel.DataAnnotations;
 
 namespace GtMotive.Estimate.Microservice.Api.Requests

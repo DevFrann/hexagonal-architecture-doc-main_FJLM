@@ -22,6 +22,8 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.Retur
 
         public async Task Execute(ReturnVehicleInput input)
         {
+            ArgumentNullException.ThrowIfNull(input);
+
             var cancellationToken = CancellationToken.None;
             var vehicleId = ParseVehicleId(input.VehicleId);
 

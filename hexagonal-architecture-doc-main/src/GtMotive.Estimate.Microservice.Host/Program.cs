@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
@@ -22,17 +23,26 @@ using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = WebApplication.CreateBuilder();
+var keyVaultName = builder.Configuration.GetValue<string>("KeyVaultName");
+var hasKeyVaultConfiguration =
+    !string.IsNullOrWhiteSpace(keyVaultName) &&
+    !keyVaultName.StartsWith("Set by environment", StringComparison.OrdinalIgnoreCase);
+var useLocalConfiguration = builder.Environment.IsDevelopment() || !hasKeyVaultConfiguration;
 
 // Configuration.
-if (!builder.Environment.IsDevelopment())
+if (!useLocalConfiguration)
 {
     builder.Configuration.AddJsonFile("serilogsettings.json", optional: false, reloadOnChange: true);
 
     var secretClient = new SecretClient(
-        new Uri($"https://{builder.Configuration.GetValue<string>("KeyVaultName")}.vault.azure.net/"),
+        new Uri($"https://{keyVaultName}.vault.azure.net/"),
         new DefaultAzureCredential());
 
     builder.Configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+}
+else if (!builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 }
 
 // Logging configuration for host bootstrapping.
@@ -47,7 +57,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
-if (!builder.Environment.IsDevelopment())
+if (!useLocalConfiguration)
 {
     builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
     builder.Services.AddApplicationInsightsKubernetesEnricher();
@@ -65,7 +75,7 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.AddControllers(ApiConfiguration.ConfigureControllers)
     .WithApiControllers();
 
-builder.Services.AddBaseInfrastructure(builder.Environment.IsDevelopment());
+builder.Services.AddBaseInfrastructure(useLocalConfiguration);
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -97,7 +107,7 @@ builder.Services.AddSwagger(appSettings, builder.Configuration);
 var app = builder.Build();
 
 // Logging configuration.
-Log.Logger = builder.Environment.IsDevelopment() ?
+Log.Logger = useLocalConfiguration ?
     new LoggerConfiguration()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
@@ -140,3 +150,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+[SuppressMessage("Performance", "CA1515:Consider making public types internal", Justification = "Required by WebApplicationFactory infrastructure tests.")]
+public partial class Program
+{
+    private Program()
+    {
+    }
+}

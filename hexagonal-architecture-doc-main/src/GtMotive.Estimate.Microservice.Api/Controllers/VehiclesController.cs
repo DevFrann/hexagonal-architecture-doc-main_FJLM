@@ -45,6 +45,8 @@ namespace GtMotive.Estimate.Microservice.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateVehicleRequest request)
         {
+            System.ArgumentNullException.ThrowIfNull(request);
+
             await this.createVehicleUseCase.Execute(new CreateVehicleInput(
                 request.LicensePlate!,
                 request.Brand!,
@@ -65,6 +67,8 @@ namespace GtMotive.Estimate.Microservice.Api.Controllers
         [HttpPost("{vehicleId}/rent")]
         public async Task<IActionResult> Rent(string vehicleId, [FromBody] RentVehicleRequest request)
         {
+            System.ArgumentNullException.ThrowIfNull(request);
+
             await this.rentVehicleUseCase.Execute(new RentVehicleInput(vehicleId, request.CustomerId!)).ConfigureAwait(false);
 
             return this.rentVehiclePresenter.ActionResult;

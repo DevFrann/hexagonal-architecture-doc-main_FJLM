@@ -15,6 +15,7 @@ namespace GtMotive.Estimate.Microservice.InfrastructureTests.Specs
 
         public VehiclesEndpointValidationTests(TestWebApplicationFactory factory)
         {
+            System.ArgumentNullException.ThrowIfNull(factory);
             this.httpClient = factory.CreateClient();
         }
 
@@ -29,7 +30,7 @@ namespace GtMotive.Estimate.Microservice.InfrastructureTests.Specs
             });
             using var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-            using var response = await this.httpClient.PostAsync("/api/vehicles", content);
+            using var response = await this.httpClient.PostAsync(new System.Uri("/api/vehicles", System.UriKind.Relative), content);
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }

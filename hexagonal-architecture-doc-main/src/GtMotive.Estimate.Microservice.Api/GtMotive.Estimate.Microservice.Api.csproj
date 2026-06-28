@@ -6,11 +6,11 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>1701;1702;1591</NoWarn>
+        <NoWarn>1701;1702;1591;SA1600;SA1602;S107;S6960</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <NoWarn>1701;1702;1591</NoWarn>
+        <NoWarn>1701;1702;1591;SA1600;SA1602;S107;S6960</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -19,8 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" />
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
         <PackageReference Include="MediatR" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
     </ItemGroup>

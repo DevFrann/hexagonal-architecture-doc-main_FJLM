@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GtMotive.Estimate.Microservice.InfrastructureTests.Infrastructure
 {
-    internal sealed class Startup(IWebHostEnvironment environment, IConfiguration configuration)
+    public sealed class Startup(IWebHostEnvironment environment, IConfiguration configuration)
     {
         public IWebHostEnvironment Environment { get; } = environment;
 

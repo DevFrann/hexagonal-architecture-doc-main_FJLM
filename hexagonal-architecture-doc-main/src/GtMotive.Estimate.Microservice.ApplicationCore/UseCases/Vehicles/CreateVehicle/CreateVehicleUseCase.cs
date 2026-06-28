@@ -21,6 +21,8 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Vehicles.Creat
 
         public async Task Execute(CreateVehicleInput input)
         {
+            System.ArgumentNullException.ThrowIfNull(input);
+
             var cancellationToken = CancellationToken.None;
             var licensePlate = new LicensePlate(input.LicensePlate);
 
