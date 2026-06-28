@@ -1,4 +1,95 @@
 # Sample Implementation of Hexagonal Architecture in a Microservice
+
+## Vehicle Renting Quick Start
+
+### Requisitos
+
+- .NET SDK 9.0.100
+- Desde la raiz del repositorio
+
+El proyecto fija `9.0.100` en `global.json`, asi que conviene usar esa version para `run` y `test`.
+
+### Ejecutar en local
+
+```bash
+dotnet run --project src/GtMotive.Estimate.Microservice.Host/GtMotive.Estimate.Microservice.Host.csproj
+```
+
+Por defecto el microservicio usa un repositorio en memoria para vehiculos, asi que no necesita base de datos ni Docker para probar el flujo basico.
+
+### Lanzar tests
+
+Todos los tests:
+
+```bash
+dotnet test src/microservice.sln
+```
+
+Solo unitarios:
+
+```bash
+dotnet test test/unit/GtMotive.Estimate.Microservice.UnitTests/GtMotive.Estimate.Microservice.UnitTests.csproj
+```
+
+Solo funcionales:
+
+```bash
+dotnet test test/functional/GtMotive.Estimate.Microservice.FunctionalTests/GtMotive.Estimate.Microservice.FunctionalTests.csproj
+```
+
+Solo infraestructura:
+
+```bash
+dotnet test test/infrastructure/GtMotive.Estimate.Microservice.InfrastructureTests/GtMotive.Estimate.Microservice.InfrastructureTests.csproj
+```
+
+### Ejemplos curl
+
+Crear vehiculo:
+
+```bash
+curl -X POST http://localhost:5000/api/vehicles \
+  -H "Content-Type: application/json" \
+  -d '{
+    "licensePlate": "1234ABC",
+    "brand": "Toyota",
+    "model": "Corolla",
+    "manufactureDate": "2025-01-01"
+  }'
+```
+
+Listar disponibles:
+
+```bash
+curl http://localhost:5000/api/vehicles/available
+```
+
+Alquilar vehiculo:
+
+```bash
+curl -X POST http://localhost:5000/api/vehicles/{vehicleId}/rent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "11111111-1111-1111-1111-111111111111"
+  }'
+```
+
+Devolver vehiculo:
+
+```bash
+curl -X POST http://localhost:5000/api/vehicles/{vehicleId}/return
+```
+
+### Decisiones tecnicas
+
+- Arquitectura hexagonal: el dominio y los casos de uso no dependen de ASP.NET Core ni de la persistencia concreta.
+- Dominio con reglas de negocio: la entidad `Vehicle` protege invariantes como antiguedad maxima, alquiler y devolucion.
+- Repositorio in-memory: permite ejecutar y probar el microservicio localmente sin dependencias externas.
+- Tests:
+  - Unitarios para casos de uso aislados.
+  - Funcionales para flujo real con DI y repositorio en memoria.
+  - Infraestructura para host, routing, model binding y validacion HTTP.
+
 ## Index
 ### [Introduction](#introduction)
 ### [Clean Architecture](#clean-architecture)
@@ -705,4 +796,3 @@ The infrastructure layer is responsible to implement the **Adapters** to the **S
 
 ### User Interface
 Responsible for rendering the Graphical User Interface (GUI) to interact with the User or other systems. Made of **Controllers** which receive HTTP Requests and **Presenters** which converts the application outputs into **ViewModels** that are rendered as HTTP Responses. 
-
